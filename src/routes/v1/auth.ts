@@ -1,7 +1,5 @@
 import express from "express";
 import passport from "passport";
-// import "../config/passportConfig"; // Ensure Passport is initialized
-import "../../configs/passport"
 
 const router = express.Router();
 

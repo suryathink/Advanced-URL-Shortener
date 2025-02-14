@@ -9,6 +9,9 @@ import { globalLimiterMiddleware } from "./middlewares/authLimiter";
 import { routes } from "./routes/index";
 log4js.configure(log4jsConfig as Configuration);
 import * as dotenv from "dotenv";
+import "./configs/passport"; 
+import passport from "passport";
+import session from "express-session";
 const app = express();
 dotenv.config(); // Load environment variables from .env file
 
@@ -20,6 +23,16 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 app.options("*", cors());
+app.use(express.json());
+app.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Apply rate limiter middleware
 app.use(globalLimiterMiddleware);
