@@ -1,0 +1,28 @@
+# Node.js specific
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# IDE specific
+.idea/
+.vscode/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+
+# Testing files
+coverage/
+
+# Build files
+dist/
+build/
+
+# Local configuration
+config.json
+config.local.json
+.env
+.vercel
