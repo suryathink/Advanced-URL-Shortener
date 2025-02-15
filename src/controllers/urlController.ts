@@ -1,35 +1,8 @@
 import { Request, Response } from "express";
 import shortid from "shortid";
 import ShortUrl from "../models/shortUrl";
+import { detectOS, detectDevice } from "../helpers/detector"
 
-/*
-export const createShortUrl = async (req: Request, res: Response) => {
-    try {
-        const { longUrl, customAlias, topic } = req.body;
-        console.log("user",req.user)
-        const userId = req.user!._id;
-    
-        let shortCode = customAlias ? customAlias : shortid.generate();
-    
-        const newUrl = new ShortUrl({
-            longUrl,
-            shortCode,
-            userId,
-            topic
-        });
-    
-        await newUrl.save();
-    
-        res.status(201).json({ shortUrl: `${process.env.BASE_URL}/${shortCode}` });
-        return   
-    } catch (error) {
-        console.error("Error fetching analytics:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-         return
-    }
-};
-
-*/
 
 export const createShortUrl = async (req: Request, res: Response) => {
   try {
@@ -42,7 +15,6 @@ export const createShortUrl = async (req: Request, res: Response) => {
 
     const userId = req.user._id;
 
-    // ✅ Check if the same `longUrl` exists for the user
     const existingUrl = await ShortUrl.findOne({ longUrl, userId });
 
     if (existingUrl) {
@@ -52,10 +24,8 @@ export const createShortUrl = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Validate custom alias if provided
     let shortCode = customAlias ? customAlias : shortid.generate();
 
-    // Ensure custom alias is unique
     if (customAlias) {
       const aliasExists = await ShortUrl.findOne({ shortCode: customAlias });
       if (aliasExists) {
@@ -65,7 +35,6 @@ export const createShortUrl = async (req: Request, res: Response) => {
       }
     }
 
-    // ✅ Create and save new short URL
     const newUrl = new ShortUrl({
       longUrl,
       shortCode,
@@ -88,7 +57,6 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
   try {
     const { alias } = req.params;
 
-    // Find the short URL in the database
     const shortUrl = await ShortUrl.findOne({ shortCode: alias });
 
     if (!shortUrl) {
@@ -98,15 +66,12 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
 
     const { analytics } = shortUrl;
 
-    // Total Clicks
     const totalClicks = analytics.length;
 
-    // Unique Users (Using IP & User Agent as identifier)
     const uniqueUsers = new Set(
       analytics.map((entry) => `${entry.ip}-${entry.userAgent}`)
     ).size;
 
-    // Clicks by Date (last 7 days)
     const clicksByDateMap: Record<string, number> = {};
     const today = new Date();
 
@@ -183,3 +148,33 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
+export const redirectUrl = async (req: Request, res: Response) => {
+  try {
+    const { alias } = req.params;
+    const url = await ShortUrl.findOne({ shortCode: alias });
+    if (!url) {
+      return res.status(404).json({ message: "URL not found" });
+    }
+
+    url.clicks += 1;
+
+    url.analytics.push({
+      ip: req.ip || req.headers["x-forwarded-for"] || "Unknown",
+      userAgent: req.headers["user-agent"] || "Unknown",
+      os: detectOS(req.headers["user-agent"] || ""),
+      device: detectDevice(req.headers["user-agent"] || ""),
+      timestamp: new Date(),
+    });
+
+    await url.save();
+
+    res.redirect(url.longUrl);
+  } catch (error) {
+    console.error("Error in redirectUrl:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+

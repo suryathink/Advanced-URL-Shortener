@@ -13,7 +13,7 @@ import "./configs/passport";
 import passport from "passport";
 import session from "express-session";
 const app = express();
-dotenv.config(); // Load environment variables from .env file
+dotenv.config();
 
 const PORT = process.env.PORT;
 
