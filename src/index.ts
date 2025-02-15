@@ -24,26 +24,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.options("*", cors());
 app.use(express.json());
+
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: false, // Set `true` in production with HTTPS
+      httpOnly: true, // Prevent client-side access
+      sameSite: "lax", // Adjust if cross-origin requests fail
+    },
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Apply rate limiter middleware
+
 app.use(globalLimiterMiddleware);
 
-// Use your router for the routes
 routes(app);
 
-// Set up the logger
 const logger = log4js.getLogger();
 
-// Connect to the database and start the server
 connectDatabase()
   .then(() => {
     app.listen(PORT, () => {
@@ -52,5 +56,5 @@ connectDatabase()
   })
   .catch((error:Error) => {
     logger.error("Error connecting to the database", error);
-    process.exit(1); // Exit the process if the database connection fails
+    process.exit(1); 
   });
