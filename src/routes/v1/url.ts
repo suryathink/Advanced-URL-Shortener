@@ -8,7 +8,7 @@ import {
 } from "../../controllers/urlController";
 import { isAuthenticated } from "../../middlewares/auth";
 import { shortUrlLimiterMiddleware } from "../../middlewares/authLimiter";
-import { validateShortUrlBody } from "../../middlewares/urlShortenerMiddlewares";
+import { validateAliasParam, validateShortUrlBody } from "../../middlewares/urlShortenerMiddlewares";
 const router = express.Router();
 
 // url creation route
@@ -20,7 +20,7 @@ router.post(
   createShortUrl as any
 );
 
-router.get("/shorten/:alias", redirectUrl as any);
+router.get("/shorten/:alias",validateAliasParam as any, redirectUrl as any);
 
 router.get(
   "/analytics/overall",

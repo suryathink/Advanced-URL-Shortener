@@ -51,7 +51,7 @@ const logger = log4js.getLogger();
 connectDatabase()
   .then(() => {
     app.listen(PORT, () => {
-      logger.info(`Server listening on http://localhost:${PORT}`);
+      logger.info(`Server listening on ${process.env.BASE_URL}`);
     });
   })
   .catch((error:Error) => {

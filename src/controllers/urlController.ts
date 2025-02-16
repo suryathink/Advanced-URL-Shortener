@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import shortid from "shortid";
 import ShortUrl from "../models/shortUrl";
-import { detectOS, detectDevice } from "../helpers/detector"
+import { detectOS, detectDevice } from "../helpers/detector";
+import log4js from "log4js";
 
+const logger = log4js.getLogger("api");
 
 export const createShortUrl = async (req: Request, res: Response) => {
   try {
@@ -147,10 +149,13 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
   }
 };
 
-
 export const redirectUrl = async (req: Request, res: Response) => {
   try {
     const { alias } = req.params;
+    logger.info(
+      `Received redirect request for alias: ${alias} from IP: ${req.ip}`
+    );
+
     const url = await ShortUrl.findOne({ shortCode: alias });
     if (!url) {
       return res.status(404).json({ message: "URL not found" });
@@ -158,23 +163,28 @@ export const redirectUrl = async (req: Request, res: Response) => {
 
     url.clicks += 1;
 
-    url.analytics.push({
+    const analyticsEntry = {
       ip: req.ip || req.headers["x-forwarded-for"] || "Unknown",
       userAgent: req.headers["user-agent"] || "Unknown",
       os: detectOS(req.headers["user-agent"] || ""),
       device: detectDevice(req.headers["user-agent"] || ""),
       timestamp: new Date(),
-    });
+    };
+
+    url.analytics.push(analyticsEntry);
+
+    logger.info(
+      `Analytics updated for alias ${alias}: ${JSON.stringify(analyticsEntry)}`
+    );
 
     await url.save();
-
+    logger.info(`Redirecting alias ${alias} to URL: ${url.longUrl}`);
     res.redirect(url.longUrl);
   } catch (error) {
-    console.error("Error in redirectUrl:", error);
+    logger.error(`Error in redirectUrl for alias ${req.params.alias}:`, error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 
 export const getTopicBasedAnalytics = async (req: Request, res: Response) => {
   try {
@@ -239,12 +249,12 @@ export const getTopicBasedAnalytics = async (req: Request, res: Response) => {
 export const getOverallAnalytics = async (req: Request, res: Response) => {
   try {
     // Ensure the user is authenticated
-    console.log("request came here")
+    console.log("request came here");
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const userId = req.user._id;
-    console.log("userId",userId)
+    console.log("userId", userId);
 
     // Find all short URLs created by the authenticated user
     const urls = await ShortUrl.find({ userId });
@@ -256,17 +266,25 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
     let totalClicks = 0;
     const overallUniqueUserSet = new Set<string>();
     const clicksByDateMap: Record<string, number> = {};
-    const osStats: Record<string, { uniqueClicks: number; uniqueUsers: Set<string> }> = {};
-    const deviceStats: Record<string, { uniqueClicks: number; uniqueUsers: Set<string> }> = {};
+    const osStats: Record<
+      string,
+      { uniqueClicks: number; uniqueUsers: Set<string> }
+    > = {};
+    const deviceStats: Record<
+      string,
+      { uniqueClicks: number; uniqueUsers: Set<string> }
+    > = {};
 
     // Process each URL document
     urls.forEach((url) => {
       totalClicks += url.clicks;
       url.analytics.forEach((event) => {
-        console.log("event",event)
+        console.log("event", event);
 
         // Unique user key: if event.userId exists, use it; otherwise, use IP-userAgent combination
-        const userKey = event.userId ? event.userId.toString() : `${event.ip}-${event.userAgent}`;
+        const userKey = event.userId
+          ? event.userId.toString()
+          : `${event.ip}-${event.userAgent}`;
         overallUniqueUserSet.add(userKey);
 
         // Group clicks by date (format: YYYY-MM-DD)
@@ -284,7 +302,10 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
         // Group analytics by device
         const deviceName = event.device || "Unknown";
         if (!deviceStats[deviceName]) {
-          deviceStats[deviceName] = { uniqueClicks: 0, uniqueUsers: new Set<string>() };
+          deviceStats[deviceName] = {
+            uniqueClicks: 0,
+            uniqueUsers: new Set<string>(),
+          };
         }
         deviceStats[deviceName].uniqueClicks++;
         deviceStats[deviceName].uniqueUsers.add(userKey);
@@ -304,11 +325,13 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
     }));
 
     // Convert device stats to desired array format
-    const deviceType = Object.entries(deviceStats).map(([deviceName, stats]) => ({
-      deviceName,
-      uniqueClicks: stats.uniqueClicks,
-      uniqueUsers: stats.uniqueUsers.size,
-    }));
+    const deviceType = Object.entries(deviceStats).map(
+      ([deviceName, stats]) => ({
+        deviceName,
+        uniqueClicks: stats.uniqueClicks,
+        uniqueUsers: stats.uniqueUsers.size,
+      })
+    );
 
     return res.json({
       totalUrls,
