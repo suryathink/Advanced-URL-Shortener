@@ -19,7 +19,6 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 
-app.use(logRequests);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,6 +41,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(logRequests);
 
 
 app.use(globalLimiterMiddleware);
