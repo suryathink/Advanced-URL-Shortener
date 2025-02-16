@@ -39,9 +39,9 @@ jobs:
 
       - name: Prepare and Deploy to EC2
         env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}         # Your EC2 instance's public IP or DNS
-          EC2_USER: ${{ secrets.EC2_USER }}         # For Ubuntu, typically "ubuntu"
-          EC2_KEY: ${{ secrets.EC2_KEY }}           # Your EC2 SSH private key stored as a secret
+          EC2_HOST: ${{ secrets.EC2_HOST }} # Your EC2 instance's public IP or DNS
+          EC2_USER: ${{ secrets.EC2_USER }} # For Ubuntu, typically "ubuntu"
+          EC2_KEY: ${{ secrets.EC2_KEY }} # Your EC2 SSH private key stored as a secret
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
@@ -64,4 +64,4 @@ jobs:
             docker-compose down
             # Start (or recreate) containers in detached mode; the .env file on EC2 is used
             docker-compose up -d
-EOF
+          EOF
