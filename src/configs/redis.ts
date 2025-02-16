@@ -3,7 +3,7 @@ import log4js from "log4js";
 
 const logger = log4js.getLogger("api");
 
-const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
+const redisUrl = process.env.REDIS_URL!
 const redis = new Redis(redisUrl);
 
 redis.on("connect", () => {
