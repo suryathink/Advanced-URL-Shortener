@@ -31,13 +31,20 @@ jobs:
 
   deploy:
     name: Deploy to AWS EC2
-    uses: appleboy/ssh-action@master
-    with:
-      host: ${{ secrets.EC2_HOST }}
-      username: ${{ secrets.EC2_USER }}
-      key: ${{ secrets.EC2_KEY }}
-      script: |
-        sudo docker pull suryathink/url-shortener-backend:latest
-        sudo docker stop url-shortener-backend || true
-        sudo docker rm url-shortener-backend || true
-        sudo docker run -d --name url-shortener-backend -p 6700:6700 suryathink/url-shortener-backend:latest
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} # Your EC2 instance's public IP or DNS
+          username: ${{ secrets.EC2_USER }} # For example, "ubuntu"
+          key: ${{ secrets.EC2_KEY }} # Your EC2 SSH private key (as a secret)
+          script: |
+            sudo docker pull suryathink/url-shortener-backend:latest
+            sudo docker stop url-shortener-backend || true
+            sudo docker rm url-shortener-backend || true
+            sudo docker run -d --name url-shortener-backend -p 6700:6700 suryathink/url-shortener-backend:latest
