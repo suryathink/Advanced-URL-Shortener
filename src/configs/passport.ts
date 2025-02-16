@@ -2,7 +2,6 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import User from "../models/user";
-import { Request } from "express";
 
 dotenv.config();
 
@@ -30,7 +29,7 @@ passport.use(
         return done(null, user);
       } catch (error) {
         console.log(error);
-        return done(error, null);
+        return done(error, undefined);
       }
     }
   )
@@ -43,8 +42,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (user, done) => {
-  console.log("Deserializing User ID:", user);
-  const { _id } = user;
+  const { _id } = user as any;
 
   try {
     const user: any = await User.findById(_id);

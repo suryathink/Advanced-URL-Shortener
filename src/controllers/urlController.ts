@@ -14,7 +14,7 @@ export const createShortUrl = async (req: Request, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const userId = req.user._id.toString();
+    const userId = (req.user as any)._id.toString();
 
     const existingUrl = await ShortUrl.findOne({ longUrl, userId });
 
@@ -283,7 +283,7 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const userId = req.user._id;
+    const userId = (req.user as any)._id.toString();
     console.log("userId", userId);
 
     // Find all short URLs created by the authenticated user
@@ -308,7 +308,7 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
     // Process each URL document
     urls.forEach((url) => {
       totalClicks += url.clicks;
-      url.analytics.forEach((event) => {
+      url.analytics.forEach((event:any) => {
         console.log("event", event);
 
         // Unique user key: if event.userId exists, use it; otherwise, use IP-userAgent combination
