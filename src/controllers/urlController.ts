@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import shortid from "shortid";
+import log4js from "log4js";
 import ShortUrl from "../models/shortUrl";
 import { detectOS, detectDevice } from "../helpers/detector";
-import log4js from "log4js";
 
 const logger = log4js.getLogger("api");
 
