@@ -45,7 +45,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }} # Your EC2 SSH private key (as a secret)
           port: 22
           script: |
-            cd /home/ec2-user/your-project/
+            cd Advanced-URL-Shortener
             # Pull the latest Docker images (including the updated backend image)
             docker-compose pull
             # Restart containers in detached mode. The .env file on EC2 is used.
