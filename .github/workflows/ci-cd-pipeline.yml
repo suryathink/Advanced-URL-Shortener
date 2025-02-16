@@ -40,4 +40,4 @@ jobs:
         sudo docker pull suryathink/url-shortener-backend:latest
         sudo docker stop url-shortener-backend || true
         sudo docker rm url-shortener-backend || true
-        sudo docker run -d --name url-shortener-backend -p 3005:3000 suryathink/url-shortener-backend:latest
+        sudo docker run -d --name url-shortener-backend -p 6700:6700 suryathink/url-shortener-backend:latest
