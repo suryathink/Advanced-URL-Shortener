@@ -3,6 +3,7 @@ import shortid from "shortid";
 import log4js from "log4js";
 import ShortUrl from "../models/shortUrl";
 import { detectOS, detectDevice } from "../helpers/detector";
+import redis from "../configs/redis"; 
 
 const logger = log4js.getLogger("api");
 
@@ -149,36 +150,65 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
   }
 };
 
+// Helper function: update analytics in the background
+const updateAnalytics = async (id: string, req: Request) => {
+  try {
+    const url = await ShortUrl.findById(id);
+    if (url) {
+      url.clicks += 1;
+      url.analytics.push({
+        ip: req.ip || req.headers["x-forwarded-for"] || "Unknown",
+        userAgent: req.headers["user-agent"] || "Unknown",
+        os: detectOS(req.headers["user-agent"] || ""),
+        device: detectDevice(req.headers["user-agent"] || ""),
+        timestamp: new Date(),
+      });
+      await url.save();
+      logger.info(`Analytics updated for URL ID: ${id}`);
+    }
+  } catch (err) {
+    logger.error(`Error updating analytics for URL ID: ${id}`, err);
+  }
+};
+
+
 export const redirectUrl = async (req: Request, res: Response) => {
   try {
     const { alias } = req.params;
-    logger.info(
-      `Received redirect request for alias: ${alias} from IP: ${req.ip}`
-    );
+    logger.info(`Received redirect request for alias: ${alias} from IP: ${req.ip}`);
 
+    const cacheKey = `shortUrl:${alias}`;
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      const { longUrl, id } = JSON.parse(cachedData);
+      logger.info(`Cache hit for alias: ${alias}, redirecting to: ${longUrl}`);
+      updateAnalytics(id, req);
+      return res.redirect(longUrl);
+    }
+
+    // If not in cache, fetch from the database
     const url = await ShortUrl.findOne({ shortCode: alias });
     if (!url) {
+      logger.warn(`URL not found for alias: ${alias}`);
       return res.status(404).json({ message: "URL not found" });
     }
 
+    // Update analytics synchronously (for first-time fetch)
     url.clicks += 1;
-
-    const analyticsEntry = {
+    url.analytics.push({
       ip: req.ip || req.headers["x-forwarded-for"] || "Unknown",
       userAgent: req.headers["user-agent"] || "Unknown",
       os: detectOS(req.headers["user-agent"] || ""),
       device: detectDevice(req.headers["user-agent"] || ""),
       timestamp: new Date(),
-    };
-
-    url.analytics.push(analyticsEntry);
-
-    logger.info(
-      `Analytics updated for alias ${alias}: ${JSON.stringify(analyticsEntry)}`
-    );
-
+    });
     await url.save();
-    logger.info(`Redirecting alias ${alias} to URL: ${url.longUrl}`);
+
+    const cacheValue = JSON.stringify({ longUrl: url.longUrl, id: url._id });
+    await redis.set(cacheKey, cacheValue, "EX", 3600);
+    logger.info(`Cache set for alias: ${alias}`);
+
     res.redirect(url.longUrl);
   } catch (error) {
     logger.error(`Error in redirectUrl for alias ${req.params.alias}:`, error);

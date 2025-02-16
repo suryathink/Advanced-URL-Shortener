@@ -11,6 +11,7 @@ import { logRequests } from "./middlewares/requestLogger";
 import { globalLimiterMiddleware } from "./middlewares/authLimiter";
 import { routes } from "./routes/index";
 import "./configs/passport"; 
+import "./configs/redis";
 
 log4js.configure(log4jsConfig as Configuration);
 
