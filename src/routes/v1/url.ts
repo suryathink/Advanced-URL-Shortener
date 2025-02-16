@@ -38,6 +38,7 @@ router.get(
   "/analytics/:alias",
   isAuthenticated,
   shortUrlLimiterMiddleware,
+  validateAliasParam as any,
   getUrlAnalytics as any
 );
 
