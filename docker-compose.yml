@@ -3,11 +3,11 @@ version: "3.8"
 services:
   backend:
     build: .
-    container_name: suryathink/url-shortener-backend:latest
+    container_name: url-shortener-backend
     restart: always
-    env_file: .env # Ensure you have a .env file with necessary variables
+    env_file: .env
     ports:
-      - "6700:6700" # Maps container's port 6700 to host port 6700 (or you can map to 80 if using a reverse proxy)
+      - "6700:6700"
     depends_on:
       - redis
     networks:
@@ -18,10 +18,15 @@ services:
     container_name: redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  redis_data:
