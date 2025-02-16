@@ -4,5 +4,5 @@ import url from "./url"
 
 export const v1Apis = function (app: Express) {
   app.use("/api/v1/auth", auth);
-  app.use("/api/v1/url", url);
+  app.use("/api", url);
 };
