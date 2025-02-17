@@ -45,12 +45,12 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           # Save the PEM key to a file and set correct permissions
-          echo "${EC2_KEY}" | sed 's/\\n/\n/g' > ec2_key.pem
-          chmod 400 ec2_key.pem
+          echo "${EC2_KEY}" | sed 's/\\n/\n/g' > url-shortener-backend.pem
+          chmod 400 url-shortener-backend.pem
           # Test the SSH connection
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${EC2_USER}@${EC2_HOST} "echo Connected successfully"
+          ssh -o StrictHostKeyChecking=no -i url-shortener-backend.pem ${EC2_USER}@${EC2_HOST} "echo Connected successfully"
           # Connect to EC2 and deploy
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${EC2_USER}@${EC2_HOST} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i url-shortener-backend.pem ${EC2_USER}@${EC2_HOST} << 'EOF'
             # Log into Docker Hub on the EC2 instance
             docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
             # Pull the latest backend image from Docker Hub
