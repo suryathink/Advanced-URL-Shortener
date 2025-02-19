@@ -17,6 +17,7 @@ import { setupSwagger } from "./configs/swagger";
 log4js.configure(log4jsConfig as Configuration);
 
 const app = express();
+setupSwagger(app); 
 dotenv.config();
 
 const PORT = process.env.PORT;
@@ -45,10 +46,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(logRequests);
 
-
 app.use(globalLimiterMiddleware);
 routes(app);
-setupSwagger(app); 
 
 const logger = log4js.getLogger();
 
