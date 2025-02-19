@@ -1,9 +1,9 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
-import log4js from "log4js";
 import path from "path";
-const logger = log4js.getLogger("api");
+
+const fileExtension = process.env.NODE_ENV === "production" ? "js" : "ts";
 
 const swaggerOptions = {
   definition: {
@@ -29,8 +29,8 @@ const swaggerOptions = {
     ],
   },
   apis: [
-    path.join(__dirname, "../routes/v1/*.ts"), 
-    path.join(__dirname, "../routes/*.ts"),  
+    path.resolve(__dirname, `../routes/v1/*.${fileExtension}`),
+    path.resolve(__dirname, `../routes/*.${fileExtension}`),
   ],
 };
 
@@ -38,5 +38,11 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 export const setupSwagger = (app: Express) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  logger.info("📜 Swagger docs available at: https://us.suryathink.com/api-docs");
+  console.log(
+    `📜 Swagger docs available at: ${
+      process.env.NODE_ENV === "production"
+        ? "https://us.suryathink.com/api-docs"
+        : "http://localhost:6700/api-docs"
+    }`
+  );
 };
