@@ -1,156 +1,247 @@
 # Advanced URL Shortener API
 
-## 📌 Overview
-The **Advanced URL Shortener API** is a high-performance, scalable URL shortening service built with **Node.js, Express, TypeScript, and MongoDB**. It includes features like user authentication, analytics tracking, rate limiting, Redis caching, and Dockerization.
+## Overview
 
-## 🚀 Features
-- **URL Shortening**: Generate short URLs that redirect to long URLs.
-- **Google OAuth Authentication**: Users can log in via Google.
-- **Rate Limiting**: Prevents API abuse using `express-rate-limit`.
-- **Redis Caching**: Improves performance for frequently accessed URLs.
-- **Analytics Tracking**: Track the number of times a URL is accessed.
-- **Swagger API Docs**: Auto-generated documentation.
-- **Dockerized Deployment**: Easy containerized setup.
-- **Production Deployment**: Hosted on AWS EC2.
+The Advanced URL Shortener API allows users to shorten long URLs, track analytics, and manage URLs efficiently. It supports Google Sign-In authentication, rate-limiting, analytics tracking, and topic-based URL categorization.
 
----
+## Deployment URL
 
-## 📂 Project Structure
-```
-/Advanced-URL-Shortener
-├── /server               # Backend API
-│   ├── /routes           # API Routes
-│   ├── /controllers      # Controllers handling logic
-│   ├── /models           # MongoDB models
-│   ├── /middlewares      # Middleware functions
-│   ├── /config           # Configuration files (env, DB, Redis)
-│   ├── /utils            # Helper functions
-│   ├── server.ts         # Main server file
-│   ├── swagger.ts        # Swagger Documentation setup
-│   ├── docker-compose.yml
-├── .env                  # Environment variables
-├── package.json          # Dependencies and scripts
-├── README.md             # Documentation
-```
+Live API: [https://us.suryathink.com](https://us.suryathink.com)
+Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com/health)
+
+## Features
+
+- Google Sign-In for authentication.
+- URL shortening with optional custom alias.
+- Rate limiting to prevent abuse.
+- URL redirection with analytics tracking.
+- Detailed analytics on user engagement, OS type, and device type.
+- Topic-based analytics.
+- Overall analytics for a user.
+
+## Tech Stack
+
+- **Backend:** Node.js, Express.js, TypeScript
+- **Database:** MongoDB
+- **Cache:** Redis
+- **Authentication:** Google OAuth
+- **Deployment:** AWS EC2, Docker
+- **API Documentation:** Swagger
 
 ---
 
-## 🛠️ Installation & Running Locally
-### **1️⃣ Clone the Repository**
-```sh
-git clone https://github.com/suryathink/Advanced-URL-Shortener.git
-cd Advanced-URL-Shortener/server
-```
-### **2️⃣ Install Dependencies**
-```sh
-npm install
-```
-### **3️⃣ Set Up Environment Variables**
-Create a `.env` file in the root of the `server` directory:
-```
-PORT=6700
-MONGO_URL=mongodb+srv://your_mongo_uri
-JWT_SECRET=your_jwt_secret
-REDIS_URL=redis://your_redis_url
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-```
+## Installation & Setup
 
-### **4️⃣ Start the Server**
-```sh
-npm run start:dev  # For development
-npm run build && npm start  # For production
-```
-### **5️⃣ Access the API**
-- **Base URL (Local)**: `http://localhost:6700`
-- **Base URL (Production)**: `https://us.suryathink.com`
-- **Swagger Docs**: `https://us.suryathink.com/api-docs`
+### Prerequisites
+
+- Node.js (v18+)
+- Docker
+- MongoDB instance (local or cloud)
+- Redis server (local or cloud)
+
+### Steps to Run Locally
+
+1. **Clone the Repository:**
+
+   ```sh
+   git clone https://github.com/suryathink/Advanced-URL-Shortener.git
+   cd Advanced-URL-Shortener
+   ```
+
+2. **Install Dependencies:**
+
+   ```sh
+   npm install
+   ```
+
+3. **Set Up Environment Variables:**
+   Create a `.env` file in the root directory with the following:
+
+   ```env
+   NODE_ENV=development
+   PORT=6700
+   MONGO_URL=mongodb+srv://<your-db-url>
+   REDIS_URL=redis://<your-redis-url>
+   JWT_SECRET=<your-jwt-secret>
+   GOOGLE_CLIENT_ID=<your-google-client-id>
+   GOOGLE_CLIENT_SECRET=<your-google-client-secret>
+   NODE_ENV=development
+   ```
+
+4. **Start the Server:**
+
+   ```sh
+   npm run start:dev
+   ```
+
+   The API will run on `http://localhost:6700`
+
+5. **Access Swagger Docs:**
+   Open: `http://localhost:6700/api-docs`
 
 ---
 
-## 📜 API Endpoints
-### **1️⃣ Authentication**
-#### **Google OAuth**
-- `POST /api/v1/auth/google`
-  - Request: `{ token: "google_access_token" }`
-  - Response:
-    ```json
-    {
-      "success": true,
-      "token": "jwt_token",
-      "user": {
-        "id": "user_id",
-        "email": "user@example.com"
-      }
-    }
-    ```
+## API Endpoints
 
-### **2️⃣ URL Shortening**
-#### **Shorten a URL**
-- `POST /api/shorten`
-  - Request:
-    ```json
-    {
-      "longUrl": "https://example.com"
+### 1. User Authentication
+
+#### **Google Sign-In**
+
+- **Endpoint:** `/api/v1/auth/google`
+- **Method:** `POST`
+- **Description:** Authenticate users via Google Sign-In.
+- **Request Body:**
+  ```json
+  {
+    "idToken": "<google_id_token>"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "token": "<jwt_token>",
+    "user": {
+      "id": "<user_id>",
+      "email": "user@example.com"
     }
-    ```
-  - Response:
-    ```json
-    {
-      "shortUrl": "https://us.suryathink.com/api/shorten/uQpydU3wQ"
-    }
-    ```
+  }
+  ```
+
+---
+
+### 2. Create Short URL
+
+#### **Shorten URL**
+
+- **Endpoint:** `/api/shorten`
+- **Method:** `POST`
+- **Description:** Generates a short URL from a long URL.
+- **Request Body:**
+  ```json
+  {
+    "longUrl": "https://example.com/long-url",
+    "customAlias": "optional-alias",
+    "topic": "marketing"
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "shortUrl": "https://us.suryathink.com/uQpydU3wQ",
+    "createdAt": "2025-02-19T17:47:53.274Z"
+  }
+  ```
+- **Rate Limiting:** Users can create only a limited number of short URLs per hour.
+
+---
+
+### 3. Redirect Short URL
 
 #### **Redirect to Original URL**
-- `GET /api/shorten/{alias}`
-  - Example: `GET /api/shorten/uQpydU3wQ`
-  - Response: Redirects to original URL
 
-### **3️⃣ Analytics**
-#### **Get URL Analytics**
-- `GET /api/analytics/{alias}`
-  - Response:
-    ```json
-    {
-      "alias": "uQpydU3wQ",
-      "clicks": 150,
-      "createdAt": "2025-02-19T17:47:51.497Z"
-    }
-    ```
+- **Endpoint:** `/api/shorten/{alias}`
+- **Method:** `GET`
+- **Description:** Redirects the user to the original long URL.
+- **Response:** 302 Redirect to the original URL.
 
 ---
 
-## 🚢 Deployment
-### **1️⃣ Docker Setup**
-#### **Build and Run the Container**
-```sh
-docker build -t advanced-url-shortener .
-docker run -p 6700:6700 --env-file .env advanced-url-shortener
-```
-#### **Using Docker Compose**
-```sh
-docker-compose up --build -d
-```
-#### **Restart Docker Container**
-```sh
-docker restart url-shortener-backend
-```
+### 4. Get URL Analytics
 
-### **2️⃣ AWS EC2 Deployment (Production)**
-- **SSH into EC2 Instance**
-  ```sh
-  ssh -i your-key.pem ubuntu@your-ec2-ip
-  ```
-- **Pull the Latest Code & Restart Docker**
-  ```sh
-  git pull origin main
-  docker-compose up --build -d
-  ```
+#### **Retrieve Analytics for a Short URL**
 
+- **Endpoint:** `/api/analytics/{alias}`
+- **Method:** `GET`
+- **Description:** Provides analytics for a short URL.
+- **Response:**
+  ```json
+  {
+    "totalClicks": 120,
+    "uniqueUsers": 95,
+    "clicksByDate": [
+      { "date": "2025-02-12", "clicks": 10 },
+      { "date": "2025-02-13", "clicks": 15 }
+    ],
+    "osType": [{ "osName": "Windows", "uniqueClicks": 50, "uniqueUsers": 40 }],
+    "deviceType": [
+      { "deviceName": "Mobile", "uniqueClicks": 80, "uniqueUsers": 60 }
+    ]
+  }
+  ```
 
 ---
 
-## 🌍 Live Demo
-✅ **Live URL:** [https://us.suryathink.com](https://us.suryathink.com)
-✅ **API Docs:** [https://us.suryathink.com/api-docs](https://us.suryathink.com/api-docs)
+### 5. Get Topic-Based Analytics
 
+#### **Retrieve Analytics for a Topic**
+
+- **Endpoint:** `/api/analytics/topic/{topic}`
+- **Method:** `GET`
+- **Description:** Get analytics for all URLs under a topic.
+- **Response:**
+  ```json
+  {
+    "totalClicks": 500,
+    "uniqueUsers": 350,
+    "clicksByDate": [{ "date": "2025-02-12", "clicks": 50 }],
+    "urls": [
+      {
+        "shortUrl": "https://us.suryathink.com/xYZ123",
+        "totalClicks": 300,
+        "uniqueUsers": 200
+      }
+    ]
+  }
+  ```
+
+---
+
+### 6. Get Overall Analytics
+
+#### **Retrieve Overall Analytics**
+
+- **Endpoint:** `/api/analytics/overall`
+- **Method:** `GET`
+- **Description:** Provides analytics for all user URLs.
+- **Response:**
+  ```json
+  {
+    "totalUrls": 50,
+    "totalClicks": 10000,
+    "uniqueUsers": 5000
+  }
+  ```
+
+---
+
+## Deployment
+
+### Running on Docker (Production)
+
+1. **Build the Docker Image:**
+   ```sh
+   docker build -t advanced-url-shortener-backend .
+   ```
+2. **Run the Container:**
+   ```sh
+   docker run -d -p 6700:6700 --env-file .env advanced-url-shortener-backend
+   ```
+
+---
+
+## Challenges & Solutions
+
+### **1. Handling Large Analytics Data**
+
+- Implemented indexing in MongoDB to optimize query performance.
+- Used Redis for caching frequently accessed analytics data.
+
+### **2. Preventing Abuse with Rate Limiting**
+
+- Integrated rate limiting using `express-rate-limit` to prevent API misuse.
+
+### **3. Ensuring Secure Authentication**
+
+- Used Google OAuth for secure authentication instead of custom credentials.
+
+---

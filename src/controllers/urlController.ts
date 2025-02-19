@@ -97,7 +97,7 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
       { uniqueClicks: number; uniqueUsers: Set<string> }
     > = {};
     analytics.forEach((entry) => {
-      const osName = entry.os ?? "Unknown"; // Handle null/undefined values
+      const osName = entry.os ?? "Unknown"; 
       const userKey = `${entry.ip}-${entry.userAgent}`;
 
       if (!osStats[osName]) {
@@ -114,13 +114,12 @@ export const getUrlAnalytics = async (req: Request, res: Response) => {
       uniqueUsers: stats.uniqueUsers.size,
     }));
 
-    // Device Type Breakdown
     const deviceStats: Record<
       string,
       { uniqueClicks: number; uniqueUsers: Set<string> }
     > = {};
     analytics.forEach((entry) => {
-      const deviceName = entry.device ?? "Unknown"; // Handle null/undefined values
+      const deviceName = entry.device ?? "Unknown"; 
       const userKey = `${entry.ip}-${entry.userAgent}`;
 
       if (!deviceStats[deviceName]) {
@@ -236,25 +235,20 @@ export const getTopicBasedAnalytics = async (req: Request, res: Response) => {
     const overallUniqueUserSet = new Set<string>();
     const clicksByDateMap: Record<string, number> = {};
 
-    // Process each URL document
     urls.forEach((url) => {
       totalClicks += url.clicks;
       url.analytics.forEach((event) => {
-        // Use a combination of IP and user-agent to approximate unique user
         overallUniqueUserSet.add(`${event.ip}-${event.userAgent}`);
 
-        // Group clicks by date (format: YYYY-MM-DD)
         const dateStr = new Date(event.timestamp).toISOString().split("T")[0];
         clicksByDateMap[dateStr] = (clicksByDateMap[dateStr] || 0) + 1;
       });
     });
 
-    // Convert clicksByDateMap to an array (sorted by date)
     const clicksByDate = Object.entries(clicksByDateMap)
       .map(([date, count]) => ({ date, count }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Prepare URLs data array
     const urlsData = urls.map((url) => {
       const urlUniqueUsers = new Set<string>();
       url.analytics.forEach((event) => {
@@ -281,14 +275,12 @@ export const getTopicBasedAnalytics = async (req: Request, res: Response) => {
 
 export const getOverallAnalytics = async (req: Request, res: Response) => {
   try {
-    // Ensure the user is authenticated
     console.log("request came here");
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const userId = (req.user as any)._id.toString();
 
-    // Find all short URLs created by the authenticated user
     const urls = await ShortUrl.find({ userId });
     if (!urls || urls.length === 0) {
       return res.status(404).json({ message: "No URLs found for this user" });
@@ -307,21 +299,17 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
       { uniqueClicks: number; uniqueUsers: Set<string> }
     > = {};
 
-    // Process each URL document
     urls.forEach((url) => {
       totalClicks += url.clicks;
       url.analytics.forEach((event: any) => {
-        // Unique user key: if event.userId exists, use it; otherwise, use IP-userAgent combination
         const userKey = event.userId
           ? event.userId.toString()
           : `${event.ip}-${event.userAgent}`;
         overallUniqueUserSet.add(userKey);
 
-        // Group clicks by date (format: YYYY-MM-DD)
         const dateStr = new Date(event.timestamp).toISOString().split("T")[0];
         clicksByDateMap[dateStr] = (clicksByDateMap[dateStr] || 0) + 1;
 
-        // Group analytics by OS
         const osName = event.os || "Unknown";
         if (!osStats[osName]) {
           osStats[osName] = { uniqueClicks: 0, uniqueUsers: new Set<string>() };
@@ -329,7 +317,6 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
         osStats[osName].uniqueClicks++;
         osStats[osName].uniqueUsers.add(userKey);
 
-        // Group analytics by device
         const deviceName = event.device || "Unknown";
         if (!deviceStats[deviceName]) {
           deviceStats[deviceName] = {
@@ -342,19 +329,16 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
       });
     });
 
-    // Convert clicksByDateMap to an array (sorted by date)
     const clicksByDate = Object.entries(clicksByDateMap)
       .map(([date, count]) => ({ date, count }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Convert OS stats to desired array format
     const osType = Object.entries(osStats).map(([osName, stats]) => ({
       osName,
       uniqueClicks: stats.uniqueClicks,
       uniqueUsers: stats.uniqueUsers.size,
     }));
 
-    // Convert device stats to desired array format
     const deviceType = Object.entries(deviceStats).map(
       ([deviceName, stats]) => ({
         deviceName,
