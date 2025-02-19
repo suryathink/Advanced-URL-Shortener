@@ -1,7 +1,9 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
+import log4js from "log4js";
 import path from "path";
+const logger = log4js.getLogger("api");
 
 const swaggerOptions = {
   definition: {
@@ -36,5 +38,5 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 export const setupSwagger = (app: Express) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  console.log("📜 Swagger docs available at: https://us.suryathink.com/api-docs");
+  logger.info("📜 Swagger docs available at: https://us.suryathink.com/api-docs");
 };
