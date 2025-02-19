@@ -6,7 +6,7 @@ The Advanced URL Shortener API allows users to shorten long URLs, track analytic
 
 ## Deployment URL
 
-<!-- Live API: [https://us.suryathink.com](https://us.suryathink.com) -->
+Production Deployed BaseURL: [https://us.suryathink.com](https://us.suryathink.com)
 
 Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com/health)
 
