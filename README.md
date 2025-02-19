@@ -215,8 +215,6 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 
 ---
 
-## Deployment
-
 ### Running on Docker
 
 1. **Build the Docker Image:**
