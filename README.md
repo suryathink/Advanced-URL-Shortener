@@ -6,7 +6,8 @@ The Advanced URL Shortener API allows users to shorten long URLs, track analytic
 
 ## Deployment URL
 
-Live API: [https://us.suryathink.com](https://us.suryathink.com)
+<!-- Live API: [https://us.suryathink.com](https://us.suryathink.com) -->
+
 Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com/health)
 
 ## Features
@@ -216,7 +217,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 
 ## Deployment
 
-### Running on Docker (Production)
+### Running on Docker
 
 1. **Build the Docker Image:**
    ```sh
