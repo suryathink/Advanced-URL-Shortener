@@ -2,8 +2,13 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
 import path from "path";
+import * as dotenv from "dotenv";
+import log4js from "log4js";
+
+dotenv.config();
 
 const fileExtension = process.env.NODE_ENV === "production" ? "js" : "ts";
+const logger = log4js.getLogger();
 
 const swaggerOptions = {
   definition: {
@@ -38,7 +43,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 export const setupSwagger = (app: Express) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  console.log(
+  logger.log(
     `📜 Swagger docs available at: ${
       process.env.NODE_ENV === "production"
         ? "https://us.suryathink.com/api-docs"
