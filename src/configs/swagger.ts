@@ -7,7 +7,7 @@ import log4js from "log4js";
 
 dotenv.config();
 
-const fileExtension = process.env.NODE_ENV === "production" ? "js" : "ts";
+const fileExtension = process.env.NODE_ENV === "development" ? "ts" : "js";
 const logger = log4js.getLogger();
 
 const swaggerOptions = {
@@ -34,10 +34,11 @@ const swaggerOptions = {
     ],
   },
   apis: [
-    path.resolve(__dirname, `../routes/v1/*.${fileExtension}`),
-    path.resolve(__dirname, `../routes/*.${fileExtension}`),
+    path.join(__dirname, `../routes/v1/*.${fileExtension}`),
+    path.join(__dirname, `../routes/*.${fileExtension}`),
   ],
 };
+
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
