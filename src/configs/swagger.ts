@@ -43,7 +43,7 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 export const setupSwagger = (app: Express) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  logger.log(
+  logger.info(
     `📜 Swagger docs available at: ${
       process.env.NODE_ENV === "production"
         ? "https://us.suryathink.com/api-docs"
