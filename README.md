@@ -18,7 +18,6 @@ The **Advanced URL Shortener API** is a high-performance, scalable URL shortenin
 ## 📂 Project Structure
 ```
 /Advanced-URL-Shortener
-├── /client               # Frontend (if applicable)
 ├── /server               # Backend API
 │   ├── /routes           # API Routes
 │   ├── /controllers      # Controllers handling logic
