@@ -58,7 +58,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 ### **4️⃣ Start the Server**
 ```sh
-npm run dev  # For development
+npm run start:dev  # For development
 npm run build && npm start  # For production
 ```
 ### **5️⃣ Access the API**
