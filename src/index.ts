@@ -12,6 +12,7 @@ import { globalLimiterMiddleware } from "./middlewares/authLimiter";
 import { routes } from "./routes/index";
 import "./configs/passport"; 
 import "./configs/redis";
+import { setupSwagger } from "./configs/swagger";
 
 log4js.configure(log4jsConfig as Configuration);
 
@@ -33,9 +34,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Set `true` in production with HTTPS
-      httpOnly: true, // Prevent client-side access
-      sameSite: "lax", // Adjust if cross-origin requests fail
+      secure: false, 
+      httpOnly: true, 
+      sameSite: "lax", 
     },
   })
 );
@@ -46,8 +47,8 @@ app.use(logRequests);
 
 
 app.use(globalLimiterMiddleware);
-
 routes(app);
+setupSwagger(app); 
 
 const logger = log4js.getLogger();
 

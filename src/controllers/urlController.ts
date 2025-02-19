@@ -3,7 +3,7 @@ import shortid from "shortid";
 import log4js from "log4js";
 import ShortUrl from "../models/shortUrl";
 import { detectOS, detectDevice } from "../helpers/detector";
-import redis from "../configs/redis"; 
+import redis from "../configs/redis";
 
 const logger = log4js.getLogger("api");
 
@@ -21,7 +21,7 @@ export const createShortUrl = async (req: Request, res: Response) => {
     if (existingUrl) {
       return res.status(200).json({
         message: "URL already shortened",
-        shortUrl: `${process.env.BASE_URL}/api/shorten/${existingUrl.shortCode}`,
+        shortUrl: `${process.env.PROD_BASE_URL}/api/shorten/${existingUrl.shortCode}`,
       });
     }
 
@@ -47,7 +47,9 @@ export const createShortUrl = async (req: Request, res: Response) => {
 
     return res
       .status(201)
-      .json({ shortUrl: `${process.env.BASE_URL}/api/shorten/${shortCode}` });
+      .json({
+        shortUrl: `${process.env.PROD_BASE_URL}/api/shorten/${shortCode}`,
+      });
   } catch (error) {
     console.error("Error creating short URL:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -171,11 +173,12 @@ const updateAnalytics = async (id: string, req: Request) => {
   }
 };
 
-
 export const redirectUrl = async (req: Request, res: Response) => {
   try {
     const { alias } = req.params;
-    logger.info(`Received redirect request for alias: ${alias} from IP: ${req.ip}`);
+    logger.info(
+      `Received redirect request for alias: ${alias} from IP: ${req.ip}`
+    );
 
     const cacheKey = `shortUrl:${alias}`;
     const cachedData = await redis.get(cacheKey);
@@ -258,7 +261,7 @@ export const getTopicBasedAnalytics = async (req: Request, res: Response) => {
         urlUniqueUsers.add(`${event.ip}-${event.userAgent}`);
       });
       return {
-        shortUrl: `${process.env.BASE_URL}/${url.shortCode}`,
+        shortUrl: `${process.env.PROD_BASE_URL}/${url.shortCode}`,
         totalClicks: url.clicks,
         uniqueUsers: urlUniqueUsers.size,
       };
@@ -284,7 +287,6 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const userId = (req.user as any)._id.toString();
-    console.log("userId", userId);
 
     // Find all short URLs created by the authenticated user
     const urls = await ShortUrl.find({ userId });
@@ -308,9 +310,7 @@ export const getOverallAnalytics = async (req: Request, res: Response) => {
     // Process each URL document
     urls.forEach((url) => {
       totalClicks += url.clicks;
-      url.analytics.forEach((event:any) => {
-        console.log("event", event);
-
+      url.analytics.forEach((event: any) => {
         // Unique user key: if event.userId exists, use it; otherwise, use IP-userAgent combination
         const userKey = event.userId
           ? event.userId.toString()
