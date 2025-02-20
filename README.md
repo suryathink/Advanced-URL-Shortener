@@ -4,6 +4,13 @@
 
 The Advanced URL Shortener API allows users to shorten long URLs, track analytics, and manage URLs efficiently. It supports Google Sign-In authentication, rate-limiting, analytics tracking, and topic-based URL categorization.
 
+### Example Redirection
+
+This URL:  
+➡️ **[`https://us.suryathink.com/api/shorten/uQpydU3wQ`](https://us.suryathink.com/api/shorten/uQpydU3wQ)**  
+will redirect to:  
+🔗 **[`https://github.com/code100x/cms`](https://github.com/code100x/cms)**
+
 ## Deployment URL
 
 Production Deployed BaseURL: [https://us.suryathink.com](https://us.suryathink.com)
@@ -89,6 +96,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 #### **Google Sign-In**
 
 - **Endpoint:** `/api/v1/auth/google`
+- **Full URL:** `https://us.suryathink.com/api/v1/auth/google`
 - **Method:** `POST`
 - **Description:** Authenticate users via Google Sign-In.
 - **Request Body:**
@@ -115,6 +123,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 #### **Shorten URL**
 
 - **Endpoint:** `/api/shorten`
+- **Full URL:** `https://us.suryathink.com/api/shorten`
 - **Method:** `POST`
 - **Description:** Generates a short URL from a long URL.
 - **Request Body:**
@@ -141,6 +150,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 #### **Redirect to Original URL**
 
 - **Endpoint:** `/api/shorten/{alias}`
+- **Full URL:** `https://us.suryathink.com/api/shorten/{alias}`
 - **Method:** `GET`
 - **Description:** Redirects the user to the original long URL.
 - **Response:** 302 Redirect to the original URL.
@@ -152,6 +162,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 #### **Retrieve Analytics for a Short URL**
 
 - **Endpoint:** `/api/analytics/{alias}`
+- **Full URL:** `https://us.suryathink.com/api/analytics/{alias}`
 - **Method:** `GET`
 - **Description:** Provides analytics for a short URL.
 - **Response:**
@@ -177,6 +188,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 #### **Retrieve Analytics for a Topic**
 
 - **Endpoint:** `/api/analytics/topic/{topic}`
+- **Full URL:** `https://us.suryathink.com/api/analytics/topic/{topic}`
 - **Method:** `GET`
 - **Description:** Get analytics for all URLs under a topic.
 - **Response:**
@@ -202,6 +214,7 @@ Health Check Route: [https://us.suryathink.com/health](https://us.suryathink.com
 #### **Retrieve Overall Analytics**
 
 - **Endpoint:** `/api/analytics/overall`
+- **Full URL:** `https://us.suryathink.com/api/analytics/overall`
 - **Method:** `GET`
 - **Description:** Provides analytics for all user URLs.
 - **Response:**

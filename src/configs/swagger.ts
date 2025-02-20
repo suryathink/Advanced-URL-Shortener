@@ -27,10 +27,7 @@ const swaggerOptions = {
         url: "http://localhost:6700",
         description: "Local server",
       },
-      {
-        url: "https://us.suryathink.com",
-        description: "Production server",
-      },
+     
     ],
   },
   apis: [

@@ -275,7 +275,6 @@ export const getTopicBasedAnalytics = async (req: Request, res: Response) => {
 
 export const getOverallAnalytics = async (req: Request, res: Response) => {
   try {
-    console.log("request came here");
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }

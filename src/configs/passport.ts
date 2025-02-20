@@ -2,20 +2,25 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import User from "../models/user";
+import log4js from "log4js";
+
+const logger = log4js.getLogger();
 
 dotenv.config();
+
+logger.info("process.env.NODE_ENV", process.env.NODE_ENV);
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      callbackURL: "/api/v1/auth/google/callback",
+      callbackURL:
+        process.env.NODE_ENV === "development"
+          ? "/api/v1/auth/google/callback"
+          : "https://us.suryathink.com/api/v1/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log("accessToken", accessToken);
-      console.log("refreshToken", refreshToken);
-      console.log("profile", profile);
       try {
         let user = await User.findOne({ googleId: profile.id });
         if (!user) {
@@ -36,8 +41,6 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log("Serializing User:", user);
-
   done(null, user);
 });
 
